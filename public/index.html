@@ -1,1 +1,652 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Đi Chơi Nào 🌸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFF8F2;
+    --card:#FFFFFF;
+    --coral:#FF8B73;
+    --coral-dark:#F2694D;
+    --peach:#FFE3D6;
+    --sage:#7FB88F;
+    --sage-light:#E1F0E3;
+    --yellow:#FFD166;
+    --text:#4A3D34;
+    --text-muted:#A6968A;
+    --line:#F0DFD2;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Be Vietnam Pro', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3,.display{ font-family:'Baloo 2', sans-serif; }
+  a{color:inherit;}
+  button, input, select, textarea{ font-family:inherit; }
+  ::selection{background:var(--peach);}
+
+  .wrap{ max-width:1080px; margin:0 auto; padding:0 24px 64px; }
+
+  /* ---------- hero ---------- */
+  .hero{ position:relative; padding:56px 0 30px; text-align:center; overflow:hidden; }
+
+  .blob{ position:absolute; border-radius:50%; filter:blur(2px); opacity:.55; animation:float 7s ease-in-out infinite; }
+  .blob.b1{ width:120px;height:120px; background:var(--peach); top:-10px; left:6%; animation-delay:0s;}
+  .blob.b2{ width:70px;height:70px; background:var(--sage-light); top:40px; right:10%; animation-delay:1.2s;}
+  .blob.b3{ width:46px;height:46px; background:var(--yellow); top:120px; left:20%; opacity:.6; animation-delay:2.1s;}
+  .blob.b4{ width:90px;height:90px; background:var(--coral); opacity:.18; top:10px; right:24%; animation-delay:.6s;}
+
+  @keyframes float{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-14px) } }
+  @media (prefers-reduced-motion: reduce){ .blob{ animation:none; } }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--card); border:1px solid var(--line);
+    padding:6px 14px; border-radius:999px; font-size:13px;
+    color:var(--coral-dark); font-weight:600; position:relative; z-index:1;
+  }
+
+  .hero h1{
+    position:relative; z-index:1;
+    font-size:clamp(36px,6vw,56px); font-weight:800;
+    margin:18px 0 10px; color:var(--text); letter-spacing:-0.5px;
+  }
+  .hero h1 span{ color:var(--coral); }
+
+  .hero p{
+    position:relative; z-index:1; font-size:17px; color:var(--text-muted);
+    max-width:420px; margin:0 auto; line-height:1.6;
+  }
+
+  /* ---------- identity bar ---------- */
+  .identity-bar{
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap:10px; margin:26px auto 6px; max-width:640px;
+    background:var(--card); border:1px solid var(--line); border-radius:999px;
+    padding:10px 18px; font-size:13.5px; position:relative; z-index:1;
+  }
+  .identity-bar .who{ color:var(--text-muted); }
+  .identity-bar .who b{ color:var(--text); }
+  .identity-bar input[type=text]{
+    width:130px; padding:7px 12px; border-radius:999px; font-size:13px;
+    border:1.5px solid var(--line); background:#FFFCFA;
+  }
+  .identity-bar input[type=text]:focus-visible{ outline:2px solid var(--coral); }
+  .small-btn{
+    border:none; background:var(--sage-light); color:var(--sage);
+    padding:7px 13px; border-radius:999px; font-size:12.5px; font-weight:700;
+    cursor:pointer; transition:background .15s ease, color .15s ease;
+  }
+  .small-btn:hover{ background:var(--sage); color:#fff; }
+  .small-btn:focus-visible{ outline:2px solid var(--coral); }
+  .small-btn.bell.on{ background:var(--peach); color:var(--coral-dark); }
+
+  .shared-note{
+    text-align:center; font-size:12px; color:var(--text-muted);
+    max-width:440px; margin:0 auto 30px; position:relative; z-index:1;
+  }
+
+  /* ---------- toast ---------- */
+  .toast-wrap{
+    position:fixed; top:18px; right:18px; z-index:80;
+    display:flex; flex-direction:column; gap:10px; max-width:300px;
+  }
+  .toast{
+    background:var(--card); border:1.5px solid var(--coral);
+    border-radius:16px; padding:12px 16px;
+    box-shadow:0 10px 24px -12px rgba(74,61,52,.4);
+    font-size:13.5px; display:flex; gap:10px; align-items:flex-start;
+    animation:slideIn .25s ease;
+  }
+  .toast .emoji{ font-size:18px; }
+  .toast b{ color:var(--coral-dark); }
+  @keyframes slideIn{ from{ transform:translateX(24px); opacity:0;} to{transform:translateX(0); opacity:1;} }
+  @media (prefers-reduced-motion: reduce){ .toast{ animation:none; } }
+
+  /* ---------- grid ---------- */
+  .board{ display:grid; grid-template-columns:1fr 1.2fr; gap:28px; align-items:start; }
+  @media (max-width:760px){ .board{ grid-template-columns:1fr; } }
+
+  .panel{
+    background:var(--card); border-radius:28px; padding:28px 26px 30px;
+    border:1px solid var(--line); box-shadow:0 10px 30px -18px rgba(74,61,52,.25);
+    position:sticky; top:24px;
+  }
+  @media (max-width:760px){ .panel{ position:static; } }
+
+  .panel h2{ margin:0 0 4px; font-size:21px; font-weight:700; }
+  .panel .sub{ margin:0 0 20px; font-size:13.5px; color:var(--text-muted); }
+
+  label{ display:block; font-size:13px; font-weight:600; margin:16px 0 6px; color:var(--text); }
+  label.first{ margin-top:0; }
+
+  input[type=text], input[type=date], input[type=time], textarea{
+    width:100%; border:1.5px solid var(--line); background:#FFFCFA;
+    border-radius:14px; padding:11px 14px; font-size:14.5px; color:var(--text);
+    outline-offset:2px; transition:border-color .15s ease;
+  }
+  textarea{ resize:vertical; min-height:64px; font-family:inherit; }
+  input:focus-visible, textarea:focus-visible, button:focus-visible, .chip:focus-visible{ outline:2px solid var(--coral); }
+  input:focus, textarea:focus{ border-color:var(--coral); }
+
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    border:1.5px solid var(--line); background:#FFFCFA; padding:8px 13px;
+    border-radius:999px; font-size:13.5px; cursor:pointer; color:var(--text);
+    display:flex; align-items:center; gap:6px;
+    transition:transform .1s ease, background .15s ease, border-color .15s ease;
+  }
+  .chip:hover{ transform:translateY(-1px); }
+  .chip.active{ background:var(--peach); border-color:var(--coral); color:var(--coral-dark); font-weight:600; }
+
+  .submit-btn{
+    margin-top:22px; width:100%; background:var(--coral); color:#fff; border:none;
+    padding:14px; border-radius:16px; font-size:15.5px; font-weight:700; cursor:pointer;
+    box-shadow:0 8px 20px -8px rgba(255,139,115,.7);
+    transition:transform .12s ease, background .15s ease;
+  }
+  .submit-btn:hover{ background:var(--coral-dark); transform:translateY(-1px); }
+  .submit-btn:active{ transform:translateY(0); }
+  .submit-btn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+  .hint{ font-size:12px; color:var(--text-muted); margin-top:10px; text-align:center; }
+
+  .list-head{ display:flex; align-items:baseline; justify-content:space-between; margin-bottom:14px; }
+  .list-head h2{ font-size:21px; margin:0; }
+  .count-pill{ background:var(--sage-light); color:var(--sage); font-weight:700; font-size:12.5px; padding:4px 11px; border-radius:999px; }
+
+  .tickets{ display:flex; flex-direction:column; gap:16px; }
+
+  .ticket{
+    position:relative; background:var(--card); border-radius:20px;
+    padding:18px 20px 18px 22px; border:1.5px dashed var(--line);
+    display:flex; gap:14px; align-items:flex-start;
+    transform:rotate(var(--r,-0.6deg));
+    transition:transform .15s ease, box-shadow .15s ease;
+    box-shadow:0 8px 18px -14px rgba(74,61,52,.4);
+  }
+  .ticket:nth-child(even){ --r:0.7deg; }
+  .ticket:hover{ transform:rotate(0deg) translateY(-2px); box-shadow:0 14px 26px -16px rgba(74,61,52,.5); }
+
+  .ticket::before, .ticket::after{
+    content:""; position:absolute; top:50%; width:14px; height:14px;
+    background:var(--bg); border:1.5px dashed var(--line); border-radius:50%;
+    transform:translate(-50%,-50%);
+  }
+  .ticket::before{ left:-1px; }
+  .ticket::after{ right:-1px; transform:translate(50%,-50%); }
+
+  .stamp{ flex:0 0 auto; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:21px; background:var(--peach); }
+
+  .ticket-body{ flex:1; min-width:0; }
+  .ticket-body h3{ margin:0 0 4px; font-size:16.5px; font-weight:700; color:var(--text); }
+  .meta{ display:flex; flex-wrap:wrap; gap:8px 14px; font-size:12.5px; color:var(--text-muted); margin-bottom:4px; }
+  .meta span{ display:inline-flex; align-items:center; gap:4px; }
+  .note{ font-size:13px; color:var(--text-muted); margin-top:6px; font-style:italic; }
+  .by{ font-size:11.5px; color:var(--sage); font-weight:600; margin-top:6px; }
+
+  .del-btn{
+    flex:0 0 auto; border:none; background:var(--sage-light); color:var(--sage);
+    width:26px; height:26px; border-radius:50%; font-size:14px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background .15s ease, transform .1s ease;
+  }
+  .del-btn:hover{ background:#ffd6d6; color:#d9534f; transform:scale(1.06); }
+
+  .empty{ background:var(--card); border:1.5px dashed var(--line); border-radius:20px; padding:44px 20px; text-align:center; color:var(--text-muted); }
+  .empty .emoji{ font-size:34px; display:block; margin-bottom:10px; }
+  .empty strong{ color:var(--text); display:block; margin-bottom:4px; font-size:15px; }
+  .empty.err{ border-color:#e07a5f; color:#b8543c; }
+
+  footer{ text-align:center; margin-top:50px; font-size:12.5px; color:var(--text-muted); }
+</style>
+</head>
+<body>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<div class="wrap">
+  <div class="hero">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <span class="blob b4"></span>
+    <span class="eyebrow">🌷 sổ tay hẹn hò &amp; tụ tập</span>
+    <h1>Đi Chơi <span>Nào</span></h1>
+    <p>Lên lịch những buổi đi chơi be bé, giữ chúng gọn gàng và đáng yêu ở một nơi.</p>
+  </div>
+
+  <div class="identity-bar" id="identity-bar">
+    <span class="who">Bạn đang là: <b id="who-name">…</b></span>
+    <input type="text" id="name-input" placeholder="Tên của bạn" style="display:none;">
+    <button class="small-btn" id="name-btn">Đổi tên</button>
+    <button class="small-btn bell" id="bell-btn">🔔 Bật thông báo</button>
+    <span class="who" id="sync-status">🔄 Đang kết nối…</span>
+  </div>
+  <p class="shared-note" id="shared-note">Danh sách này dùng chung — mở cùng một link có <b>?room=du-lich</b> trên cả hai máy để cùng thấy lịch và nhận thông báo khi có lịch mới.</p>
+
+  <div class="board">
+    <div class="panel">
+      <h2>Thêm chuyến đi mới</h2>
+      <p class="sub">Điền vài dòng thôi, xong xuôi trong 10 giây 🍡</p>
+
+      <label class="first" for="f-title">Tên chuyến đi</label>
+      <input type="text" id="f-title" placeholder="Ví dụ: Cà phê cuối tuần với Lan">
+
+      <div class="row2">
+        <div>
+          <label for="f-date">Ngày</label>
+          <input type="date" id="f-date">
+        </div>
+        <div>
+          <label for="f-time">Giờ</label>
+          <input type="time" id="f-time">
+        </div>
+      </div>
+
+      <label for="f-place">Địa điểm</label>
+      <input type="text" id="f-place" placeholder="Ví dụ: The Coffee House, Huế">
+
+      <label>Loại hình</label>
+      <div class="chips" id="chips"></div>
+
+      <label for="f-note">Ghi chú (không bắt buộc)</label>
+      <textarea id="f-note" placeholder="Nhớ mang theo ô, hẹn 8h ở cổng..."></textarea>
+
+      <button class="submit-btn" id="add-btn">Thêm vào lịch 🌸</button>
+      <p class="hint" id="save-hint">Lịch được lưu chung cho mọi người mở link này.</p>
+    </div>
+
+    <div>
+      <div class="list-head">
+        <h2>Lịch sắp tới</h2>
+        <span class="count-pill" id="count-pill">…</span>
+      </div>
+      <div class="tickets" id="tickets">
+        <div class="empty"><span class="emoji">🌱</span>Đang tải lịch…</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Làm với 🤍 — chúc bạn có những chuyến đi thật vui</footer>
+</div>
+
+<script>
+  const CATEGORIES = [
+    { id:'cafe',    label:'Cà phê',   emoji:'☕' },
+    { id:'food',    label:'Ăn uống',  emoji:'🍜' },
+    { id:'movie',   label:'Xem phim', emoji:'🎬' },
+    { id:'outdoor', label:'Dã ngoại', emoji:'🌳' },
+    { id:'shopping',label:'Mua sắm',  emoji:'🛍️' },
+    { id:'other',   label:'Khác',     emoji:'✨' },
+  ];
+
+  let selectedCategory = CATEGORIES[0].id;
+  let trips = [];
+  let myName = '';
+  let knownIds = new Set();
+  let firstLoadDone = false;
+  let notifPermission = (typeof Notification !== 'undefined') ? Notification.permission : 'unsupported';
+  let sharedMode = 'local';
+  let sharedRoom = '';
+  let syncTimer = null;
+
+  const chipsEl = document.getElementById('chips');
+  CATEGORIES.forEach(cat=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'chip' + (cat.id === selectedCategory ? ' active' : '');
+    b.dataset.id = cat.id;
+    b.innerHTML = `<span>${cat.emoji}</span><span>${cat.label}</span>`;
+    b.addEventListener('click', ()=>{
+      selectedCategory = cat.id;
+      [...chipsEl.children].forEach(c=>c.classList.toggle('active', c.dataset.id === cat.id));
+    });
+    chipsEl.appendChild(b);
+  });
+
+  function categoryOf(id){ return CATEGORIES.find(c=>c.id===id) || CATEGORIES[CATEGORIES.length-1]; }
+
+  function formatDate(dateStr){
+    if(!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('vi-VN', { weekday:'long', day:'2-digit', month:'2-digit', year:'numeric' });
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function getSharedRoomId(){
+    const params = new URLSearchParams(window.location.search);
+    return (params.get('room') || 'default-room').trim() || 'default-room';
+  }
+
+  function updateSharedNote(){
+    const note = document.querySelector('.shared-note');
+    if(note){
+      const url = new URL(window.location.href);
+      url.searchParams.set('room', sharedRoom);
+      note.innerHTML = `Danh sách này dùng chung — gửi <b>đúng link này</b> cho người kia, cả hai mở cùng một link để thấy lịch của nhau và nhận thông báo khi có lịch mới:<br><b>${escapeHtml(url.toString())}</b>`;
+    }
+  }
+
+  function resolveApiBase(){
+    const params = new URLSearchParams(window.location.search);
+    const provided = params.get('server');
+    if(provided) return provided.replace(/\/$/, '');
+    // Mặc định: gọi API trên chính domain đang mở trang, vì server.js
+    // tự phục vụ luôn file HTML này lẫn API — chỉ cần deploy 1 server
+    // duy nhất rồi gửi cùng 1 link cho cả hai máy.
+    return window.location.origin;
+  }
+
+  async function readStoredValue(key, fallback=''){
+    try{
+      const stored = localStorage.getItem(key);
+      return stored !== null ? stored : fallback;
+    }catch(e){
+      return fallback;
+    }
+  }
+
+  async function writeStoredValue(key, value, shared=false){
+    try{
+      localStorage.setItem(key, value);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  /* ---------- identity (personal, not shared) ---------- */
+  async function loadName(){
+    const stored = await readStoredValue('my-name', '');
+    myName = stored || 'Bạn ẩn danh ' + Math.floor(Math.random()*90+10);
+    if(!stored){
+      await writeStoredValue('my-name', myName, false);
+    }
+    document.getElementById('who-name').textContent = myName;
+  }
+
+  document.getElementById('name-btn').addEventListener('click', async ()=>{
+    const input = document.getElementById('name-input');
+    const btn = document.getElementById('name-btn');
+    if(input.style.display === 'none'){
+      input.style.display = 'inline-block';
+      input.value = myName;
+      input.focus();
+      btn.textContent = 'Lưu tên';
+    }else{
+      const val = input.value.trim();
+      if(val){
+        myName = val;
+        document.getElementById('who-name').textContent = myName;
+        await writeStoredValue('my-name', myName, false);
+      }
+      input.style.display = 'none';
+      btn.textContent = 'Đổi tên';
+    }
+  });
+
+  /* ---------- browser notification permission ---------- */
+  const bellBtn = document.getElementById('bell-btn');
+  function refreshBellLabel(){
+    if(notifPermission === 'granted'){
+      bellBtn.textContent = '🔔 Đã bật thông báo';
+      bellBtn.classList.add('on');
+    }else if(notifPermission === 'unsupported'){
+      bellBtn.textContent = '🔕 Trình duyệt không hỗ trợ';
+      bellBtn.disabled = true;
+    }else{
+      bellBtn.textContent = '🔔 Bật thông báo';
+      bellBtn.classList.remove('on');
+    }
+  }
+  refreshBellLabel();
+  bellBtn.addEventListener('click', async ()=>{
+    if(typeof Notification === 'undefined') return;
+    try{
+      const perm = await Notification.requestPermission();
+      notifPermission = perm;
+    }catch(e){}
+    refreshBellLabel();
+  });
+
+  /* ---------- toast ---------- */
+  function showToast(text, emoji){
+    const wrap = document.getElementById('toast-wrap');
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.innerHTML = `<span class="emoji">${emoji || '🔔'}</span><span>${text}</span>`;
+    wrap.appendChild(el);
+    setTimeout(()=>{ el.remove(); }, 6000);
+  }
+
+  function notifyNewTrip(t){
+    const cat = categoryOf(t.category);
+    const text = `<b>${escapeHtml(t.addedBy || 'Ai đó')}</b> vừa thêm lịch: “${escapeHtml(t.title)}” — ${formatDate(t.date)}`;
+    showToast(text, cat.emoji);
+    if(notifPermission === 'granted'){
+      try{
+        new Notification('Có lịch hẹn mới 🌸', {
+          body: `${t.addedBy || 'Ai đó'} vừa thêm: ${t.title} (${formatDate(t.date)})`
+        });
+      }catch(e){}
+    }
+  }
+
+  /* ---------- room sync ---------- */
+  function applyTrips(fresh){
+    const freshIds = new Set(fresh.map(t=>t.id));
+
+    if(firstLoadDone){
+      const newOnes = fresh.filter(t=>!knownIds.has(t.id) && t.addedBy !== myName);
+      newOnes.forEach(notifyNewTrip);
+    }
+
+    trips = fresh;
+    knownIds = freshIds;
+    firstLoadDone = true;
+    render();
+  }
+
+  async function fetchTrips(){
+    try{
+      const stored = await readStoredValue('trips', '[]');
+      const parsed = JSON.parse(stored);
+      return Array.isArray(parsed) ? parsed : [];
+    }catch(e){
+      return [];
+    }
+  }
+
+  async function saveTrips(){
+    try{
+      const apiBase = resolveApiBase();
+      const response = await fetch(`${apiBase}/api/rooms/${encodeURIComponent(sharedRoom)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ trips })
+      });
+
+      if(response.ok){
+        sharedMode = 'remote';
+        updateSyncStatus();
+        return;
+      }
+    }catch(e){}
+
+    sharedMode = 'local';
+    updateSyncStatus();
+    showToast('Không kết nối được máy chủ chung — lịch chỉ lưu trên máy này.', '⚠️');
+    try{
+      const ok = await writeStoredValue('trips', JSON.stringify(trips), true);
+      if(!ok) showToast('Không lưu được lịch, thử lại nhé.', '⚠️');
+    }catch(e){
+      showToast('Lỗi khi lưu lịch, thử lại nhé.', '⚠️');
+    }
+  }
+
+  async function pollTrips(){
+    try{
+      const apiBase = resolveApiBase();
+      const response = await fetch(`${apiBase}/api/rooms/${encodeURIComponent(sharedRoom)}`);
+      if(response.ok){
+        const payload = await response.json();
+        const fresh = Array.isArray(payload && payload.trips) ? payload.trips : [];
+        sharedMode = 'remote';
+        updateSyncStatus();
+        applyTrips(fresh);
+        return;
+      }
+    }catch(e){}
+
+    sharedMode = 'local';
+    updateSyncStatus();
+    const fresh = await fetchTrips();
+    applyTrips(fresh);
+  }
+
+  function updateSyncStatus(){
+    const el = document.getElementById('sync-status');
+    if(!el) return;
+    if(sharedMode === 'remote'){
+      el.textContent = '🌐 Đang đồng bộ chung';
+      el.style.color = 'var(--sage)';
+    }else{
+      el.textContent = '📴 Chỉ lưu trên máy này';
+      el.style.color = 'var(--coral-dark)';
+    }
+  }
+
+  async function bindSharedTrips(){
+    sharedRoom = getSharedRoomId();
+    updateSharedNote();
+
+    if(syncTimer) clearInterval(syncTimer);
+    syncTimer = setInterval(()=>{
+      pollTrips();
+    }, 4000);
+
+    await pollTrips();
+  }
+
+  function render(){
+    const list = document.getElementById('tickets');
+    const countPill = document.getElementById('count-pill');
+    countPill.textContent = trips.length + ' chuyến';
+
+    if(trips.length === 0){
+      list.innerHTML = `
+        <div class="empty">
+          <span class="emoji">🎈</span>
+          <strong>Chưa có chuyến đi nào cả</strong>
+          Thêm một buổi hẹn ở bên trái để bắt đầu nhé!
+        </div>`;
+      return;
+    }
+
+    const sorted = [...trips].sort((a,b)=>{
+      const da = a.date + ' ' + (a.time || '00:00');
+      const db = b.date + ' ' + (b.time || '00:00');
+      return da.localeCompare(db);
+    });
+
+    list.innerHTML = sorted.map(t=>{
+      const cat = categoryOf(t.category);
+      return `
+        <div class="ticket">
+          <div class="stamp">${cat.emoji}</div>
+          <div class="ticket-body">
+            <h3>${escapeHtml(t.title)}</h3>
+            <div class="meta">
+              <span>📅 ${formatDate(t.date)}</span>
+              ${t.time ? `<span>🕐 ${t.time}</span>` : ''}
+              ${t.place ? `<span>📍 ${escapeHtml(t.place)}</span>` : ''}
+            </div>
+            ${t.note ? `<div class="note">"${escapeHtml(t.note)}"</div>` : ''}
+            ${t.addedBy ? `<div class="by">Thêm bởi ${escapeHtml(t.addedBy)}</div>` : ''}
+          </div>
+          <button class="del-btn" data-id="${t.id}" aria-label="Xoá chuyến đi">✕</button>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.del-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        trips = trips.filter(t=>t.id !== btn.dataset.id);
+        knownIds.delete(btn.dataset.id);
+        render();
+        await saveTrips();
+      });
+    });
+  }
+
+  const addBtn = document.getElementById('add-btn');
+  addBtn.addEventListener('click', async ()=>{
+    const title = document.getElementById('f-title').value.trim();
+    const date = document.getElementById('f-date').value;
+    const time = document.getElementById('f-time').value;
+    const place = document.getElementById('f-place').value.trim();
+    const note = document.getElementById('f-note').value.trim();
+
+    if(!title || !date){
+      const target = !title ? 'f-title' : 'f-date';
+      const el = document.getElementById(target);
+      el.style.borderColor = '#e07a5f';
+      el.focus();
+      setTimeout(()=>{ el.style.borderColor = ''; }, 1200);
+      return;
+    }
+
+    const newTrip = {
+      id: 'trip-' + Date.now() + '-' + Math.floor(Math.random()*1000),
+      title, date, time, place, note,
+      category: selectedCategory,
+      addedBy: myName
+    };
+
+    addBtn.disabled = true;
+    addBtn.textContent = 'Đang lưu…';
+
+    trips.push(newTrip);
+    knownIds.add(newTrip.id);
+    render();
+    await saveTrips();
+
+    document.getElementById('f-title').value = '';
+    document.getElementById('f-date').value = '';
+    document.getElementById('f-time').value = '';
+    document.getElementById('f-place').value = '';
+    document.getElementById('f-note').value = '';
+
+    addBtn.disabled = false;
+    addBtn.textContent = 'Thêm vào lịch 🌸';
+  });
+
+  (async function init(){
+    await loadName();
+    await bindSharedTrips();
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.visibilityState === 'visible') bindSharedTrips();
+    });
+  })();
+</script>
+</body>
+</html>
 
