@@ -1,11 +1,11 @@
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
+const { Redis } = require('@upstash/redis');
 
 const app = express();
 app.use(bodyParser.json());
 
-// Bật CORS để trang HTML vẫn gọi được API dù được host ở domain khác
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -14,29 +14,39 @@ app.use((req, res, next) => {
   next();
 });
 
-// Phục vụ luôn file public/index.html tại cùng địa chỉ với API,
-// để không cần lo domain/CORS: mọi người chỉ cần mở CHUNG 1 link.
 app.use(express.static(path.join(__dirname, 'public')));
 
-const rooms = new Map();
-
-function getRoomState(room) {
-  if (!rooms.has(room)) rooms.set(room, { trips: [] });
-  return rooms.get(room);
-}
-
-app.get('/api/rooms/:room', (req, res) => {
-  const room = (req.params.room || 'default-room').toString();
-  res.json(getRoomState(room));
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN
 });
 
-app.post('/api/rooms/:room', (req, res) => {
+function roomKey(room) {
+  return `room:${room}`;
+}
+
+app.get('/api/rooms/:room', async (req, res) => {
+  const room = (req.params.room || 'default-room').toString();
+  try {
+    const state = await redis.get(roomKey(room));
+    res.json(state || { trips: [] });
+  } catch (e) {
+    res.status(500).json({ trips: [], error: 'db_error' });
+  }
+});
+
+app.post('/api/rooms/:room', async (req, res) => {
   const room = (req.params.room || 'default-room').toString();
   const payload = req.body || {};
   const trips = Array.isArray(payload.trips) ? payload.trips : [];
   const state = { trips };
-  rooms.set(room, state);
-  res.json(state);
+
+  try {
+    await redis.set(roomKey(room), state);
+    res.json(state);
+  } catch (e) {
+    res.status(500).json({ error: 'db_error' });
+  }
 });
 
 const port = process.env.PORT || 3000;
