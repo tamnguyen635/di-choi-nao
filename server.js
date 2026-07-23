@@ -2,8 +2,9 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Redis } = require('@upstash/redis');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
+const resend = new Resend(process.env.RESEND_API_KEY);
 const app = express();
 app.use(bodyParser.json());
 
@@ -28,13 +29,6 @@ function roomKey(room) {
 
 // --- cấu hình gửi mail ---
 const NOTIFY_TO = process.env.NOTIFY_TO || 'tamvatri098@gmail.com';
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
 
 function sendNewTripEmail(trip) {
   const subject = `Lịch hẹn mới: ${trip.title}`;
@@ -45,8 +39,8 @@ function sendNewTripEmail(trip) {
     trip.note ? `Ghi chú: ${trip.note}` : ''
   ].filter(Boolean).join('\n');
 
-  transporter.sendMail({
-    from: process.env.EMAIL_USER,
+  resend.emails.send({
+    from: 'onboarding@resend.dev',
     to: NOTIFY_TO,
     subject,
     text
