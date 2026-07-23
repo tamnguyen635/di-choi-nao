@@ -2,6 +2,7 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Redis } = require('@upstash/redis');
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(bodyParser.json());
@@ -25,6 +26,33 @@ function roomKey(room) {
   return `room:${room}`;
 }
 
+// --- cấu hình gửi mail ---
+const NOTIFY_TO = process.env.NOTIFY_TO || 'tamvatri098@gmail.com';
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+function sendNewTripEmail(trip) {
+  const subject = `Lịch hẹn mới: ${trip.title}`;
+  const text = [
+    `Người thêm: ${trip.addedBy || 'Không rõ'}`,
+    `Ngày: ${trip.date}${trip.time ? ' ' + trip.time : ''}`,
+    trip.place ? `Địa điểm: ${trip.place}` : '',
+    trip.note ? `Ghi chú: ${trip.note}` : ''
+  ].filter(Boolean).join('\n');
+
+  transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: NOTIFY_TO,
+    subject,
+    text
+  }).catch(err => console.error('Gửi mail thất bại:', err.message));
+}
+
 app.get('/api/rooms/:room', async (req, res) => {
   const room = (req.params.room || 'default-room').toString();
   try {
@@ -42,8 +70,15 @@ app.post('/api/rooms/:room', async (req, res) => {
   const state = { trips };
 
   try {
+    const oldState = await redis.get(roomKey(room));
+    const oldTrips = (oldState && Array.isArray(oldState.trips)) ? oldState.trips : [];
+    const oldIds = new Set(oldTrips.map(t => t.id));
+    const newlyAdded = trips.filter(t => !oldIds.has(t.id));
+
     await redis.set(roomKey(room), state);
     res.json(state);
+
+    newlyAdded.forEach(sendNewTripEmail);
   } catch (e) {
     res.status(500).json({ error: 'db_error' });
   }
